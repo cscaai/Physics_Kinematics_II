@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSCA Physics Mock Exam - Kinematics II: Free Fall &amp; 2D Motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<!-- MathJax for rendering Mathematical & Physics LaTeX expressions -->
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  /* ============ CSCA BRAND DESIGN TOKENS (GREEN ACCENT) ============ */
+  :root {
+    --ink: #0F172A;
+    --ink-soft: #475569;
+    --canvas: #F8FAFC;
+    --card: #FFFFFF;
+    --line: #E2E8F0;
+
+    /* Brand Green Accent */
+    --primary: #059669;
+    --primary-dark: #047857;
+    --primary-light: #10B981;
+    --primary-tint: #ECFDF5;
+    --primary-glow: rgba(16, 185, 129, 0.25);
+
+    /* Brand Orange Dot Accent */
+    --brand-orange: #F97316;
+
+    --mint: #10B981;
+    --mint-tint: #D1FAE5;
+    --amber: #F59E0B;
+    --amber-tint: #FEF3C7;
+    --crimson: #EF4444;
+    --crimson-tint: #FEE2E2;
+
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.05);
+
+    --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; padding: 0; }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  button, input { font-family: inherit; }
+  button { appearance: none; border: none; cursor: pointer; background: none; color: inherit; }
+
+  .screen { display: none; min-height: 100vh; position: relative; }
+  .screen.is-active { display: flex; flex-direction: column; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+  @keyframes pulseBar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .55; }
+  }
+
+  /* ============ BULLETPROOF INLINE SVG LOGO ============ */
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    color: var(--ink);
+    user-select: none;
+    vertical-align: middle;
+  }
+  .brand-logo-white {
+    color: #FFFFFF !important;
+  }
+  .csca-logo-svg {
+    display: block;
+    height: 28px;
+    width: auto;
+    overflow: visible;
+  }
+
+  /* ============ ENTRY SCREEN & INTERACTIVE CANVAS ============ */
+  #screen-entry {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    min-height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 40%, #064E3B 0%, #022C22 60%, #011C15 100%);
+  }
+
+  #entry-bg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: auto;
+  }
+
+  .entry-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(18px);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    padding: 40px 36px 32px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    animation: fadeInUp .6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .entry-brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .exam-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    background: var(--primary-tint);
+    color: var(--primary-dark);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #A7F3D0;
+  }
+
+  .entry-card h1 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+
+  .entry-sub {
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 24px;
+  }
+
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    font-size: 15px;
+    color: var(--ink);
+    background: #f8fafc;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field input::placeholder { color: #94A3B8; }
+  .field input:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-tint);
+    background: #fff;
+  }
+  .field input.shake { animation: shake .4s ease; border-color: var(--crimson); }
+
+  .btn {
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: var(--radius-sm);
+    padding: 13px 20px;
+    transition: transform .12s ease, box-shadow .12s ease, background .15s, border-color .15s, color .15s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 3px solid var(--primary-tint); outline-offset: 2px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-block { width: 100%; }
+  .btn-primary { 
+    background: var(--primary); 
+    color: #fff; 
+    box-shadow: 0 8px 20px var(--primary-glow); 
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line); }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-tint); }
+
+  .entry-meta {
+    margin-top: 22px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .entry-meta span {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    background: #F1F5F9;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 12px;
+    color: var(--ink-soft);
+  }
+
+  /* ============ EXAM SCREEN ============ */
+  .timer-track { height: 6px; width: 100%; background: var(--line); flex-shrink: 0; }
+  .timer-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #34D399, var(--primary));
+    transition: width 1s linear, background .4s ease;
+  }
+  .timer-track.critical .timer-fill {
+    background: linear-gradient(90deg, #ff6a5f, var(--crimson));
+    animation: pulseBar 1s ease-in-out infinite;
+  }
+
+  .exam-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: #064E3B;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(6, 78, 59, 0.25);
+  }
+  .exam-header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .exam-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .01em;
+  }
+  .exam-title small {
+    display: block;
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 0;
+    opacity: .85;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .timer-display {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 17px;
+    background: rgba(255, 255, 255, 0.16);
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: .03em;
+    transition: background .2s ease;
+  }
+  .timer-display.critical { background: rgba(239, 68, 68, 0.95); }
+
+  .exam-body {
+    flex: 1;
+    display: flex;
+    gap: 24px;
+    padding: 24px 28px 40px;
+    align-items: flex-start;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .sidebar {
+    width: 270px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: sticky;
+    top: 24px;
+  }
+  .student-card {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    box-shadow: var(--shadow-soft);
+  }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: var(--primary-tint); color: var(--primary-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-family: var(--font-display);
+    border: 1.5px solid #A7F3D0;
+  }
+  .student-name { font-weight: 700; font-size: 14px; line-height: 1.3; color: var(--ink); }
+  .student-sub { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  /* Legend Indicators */
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--ink-soft); padding: 0 2px; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .indicator-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .indicator-dot.unanswered { background: #CBD5E1; }
+  .indicator-dot.answered { background: var(--primary); }
+  .indicator-dot.marked { background: var(--brand-orange); }
+
+  .grid-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: var(--shadow-soft);
+  }
+  .grid-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .grid-card-header .label { font-weight: 700; font-size: 13px; }
+  .grid-card-header .count { font-family: var(--font-mono); font-size: 12px; color: var(--primary-dark); font-weight: 700; }
+
+  .q-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .q-cell {
+    aspect-ratio: 1/1;
+    border-radius: 8px;
+    border: 1.5px solid var(--line);
+    background: #fbfcff;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s ease;
+    position: relative;
+  }
+  .q-cell:hover { border-color: var(--primary); color: var(--primary-dark); }
+  .q-cell.answered { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .q-cell.marked::after {
+    content: ''; position: absolute; top: -3px; right: -3px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--brand-orange); border: 2px solid var(--card);
+  }
+  .q-cell.current {
+    box-shadow: 0 0 0 3px var(--primary-tint);
+    border-color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* Question Panel */
+  .question-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .question-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .question-counter {
+    font-family: var(--font-mono); font-weight: 600; font-size: 13px;
+    color: var(--primary-dark); background: var(--primary-tint);
+    border: 1px solid #A7F3D0; padding: 8px 16px; border-radius: 999px;
+  }
+
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+  }
+  .question-topic-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--primary-dark); background: var(--primary-tint);
+    border: 1px solid #A7F3D0;
+    padding: 4px 10px; border-radius: 6px; margin-bottom: 16px;
+  }
+  .question-text {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.55;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+
+  .question-diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #F8FAFC;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 22px;
+  }
+
+  .options-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .option-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--line);
+    background: #fbfcfe;
+    cursor: pointer;
+    transition: all .15s ease;
+    font-size: 15px;
+  }
+  .option-item:hover { border-color: var(--primary); background: #F0FDF4; }
+  .option-item.selected {
+    border-color: var(--primary);
+    background: var(--primary-tint);
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+  .option-radio {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; background: #fff;
+    transition: all .15s ease;
+  }
+  .option-item.selected .option-radio {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .option-radio::after {
+    content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff;
+    opacity: 0; transform: scale(0); transition: all .15s ease;
+  }
+  .option-item.selected .option-radio::after { opacity: 1; transform: scale(1); }
+
+  .question-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 20px; border-top: 1px solid var(--line);
+  }
+
+  /* ============ OUTRO / RESULT SCREEN ============ */
+  #screen-outro {
+    align-items: center;
+    padding: 40px 20px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .outro-card {
+    width: 100%;
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    padding: 36px;
+    margin-bottom: 24px;
+  }
+  .score-header { text-align: center; margin-bottom: 28px; }
+  .score-header h2 { font-family: var(--font-display); font-size: 26px; font-weight: 800; margin: 10px 0 8px; }
+  .score-badge {
+    display: inline-block;
+    padding: 6px 18px; border-radius: 999px; font-weight: 700; font-size: 14px;
+    font-family: var(--font-mono); margin-bottom: 8px;
+  }
+  .score-badge.passed { background: var(--primary-tint); color: var(--primary-dark); border: 1px solid #A7F3D0; }
+  .score-badge.failed { background: var(--crimson-tint); color: var(--crimson); border: 1px solid #FECACA; }
+
+  .score-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin-bottom: 32px; text-align: center;
+  }
+  .stat-box {
+    background: #f8fafc; border: 1px solid var(--line);
+    padding: 16px 12px; border-radius: var(--radius-md);
+  }
+  .stat-val { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--ink); }
+  .stat-lbl { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+  .review-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin: 0 0 16px; }
+  .review-list { display: flex; flex-direction: column; gap: 16px; }
+  .review-item {
+    background: #fbfcfe; border: 1px solid var(--line);
+    border-radius: var(--radius-md); padding: 20px;
+  }
+  .review-item.is-correct { border-left: 5px solid var(--primary); }
+  .review-item.is-incorrect { border-left: 5px solid var(--crimson); }
+  .review-item.is-skipped { border-left: 5px solid var(--brand-orange); }
+
+  .review-q-num { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--primary-dark); margin-bottom: 6px; }
+  .review-q-text { font-weight: 600; font-size: 15px; margin-bottom: 12px; }
+  .review-ans { font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+  .review-ans span { font-weight: 600; }
+  .review-ans.user-ans { color: var(--ink-soft); }
+  .review-ans.correct-ans { color: var(--primary-dark); }
+  .review-exp {
+    margin-top: 10px; padding: 12px 14px; border-radius: 6px;
+    font-size: 13.5px; color: #334155; line-height: 1.5;
+    background: #f4f6fb; border: 1px dashed var(--line);
+  }
+
+  @media (max-width: 820px) {
+    .exam-body { flex-direction: column; padding: 16px; }
+    .sidebar { width: 100%; position: static; }
+    .score-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ ENTRY SCREEN ============ -->
+  <div id="screen-entry" class="screen is-active">
+    <canvas id="entry-bg-canvas"></canvas>
+    
+    <div class="entry-card">
+      <div class="entry-brand-header">
+        <div class="brand-logo" aria-label="csca.ai">
+          <svg class="csca-logo-svg" viewBox="0 0 108 30" height="28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="23" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="800" font-size="26" fill="currentColor" letter-spacing="-0.03em">csca<tspan fill="#F97316">.</tspan>ai</text>
+          </svg>
+        </div>
+        <span class="exam-badge">Physics Unit II</span>
+      </div>
+
+      <h1>Physics Assessment</h1>
+      <p class="entry-sub">Topic Assessment: <strong>Kinematics II: Free Fall &amp; 2D Motion</strong></p>
+      
+      <form id="entry-form" onsubmit="handleStartExam(event)">
+        <div class="field">
+          <label for="student-name-input">Candidate Name</label>
+          <input type="text" id="student-name-input" placeholder="FirstName LastName" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="student-id-input">Candidate Number <span style="font-weight:400; opacity:.7;">(Optional)</span></label>
+          <input type="text" id="student-id-input" placeholder="e.g. CSCA-PHYS-2026">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block">Begin Assessment &rarr;</button>
+      </form>
+
+      <div class="entry-meta">
+        <span>⏱ 45 Minutes</span>
+        <span>📝 25 Questions</span>
+        <span>🎯 Multiple Choice</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ EXAM SCREEN ============ -->
+  <div id="screen-exam" class="screen">
+    <div class="timer-track" id="timer-track">
+      <div class="timer-fill" id="timer-fill"></div>
+    </div>
+
+    <header class="exam-header">
+      <div class="exam-header-left">
+        <div class="brand-logo brand-logo-white" aria-label="csca.ai">
+          <svg class="csca-logo-svg" viewBox="0 0 108 30" height="28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="23" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="800" font-size="26" fill="currentColor" letter-spacing="-0.03em">csca<tspan fill="#F97316">.</tspan>ai</text>
+          </svg>
+        </div>
+        <div style="border-left:1px solid rgba(255,255,255,0.25); padding-left:16px;">
+          <div class="exam-title">CSCA Physics Mock Exam</div>
+          <small style="opacity:0.85;">Topic: Kinematics II (Free Fall &amp; 2D Motion)</small>
+        </div>
+      </div>
+      <div class="timer-display" id="timer-display">45:00</div>
+    </header>
+
+    <main class="exam-body">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="student-card">
+          <div class="avatar" id="student-avatar">FL</div>
+          <div>
+            <div class="student-name" id="display-student-name">FirstName LastName</div>
+            <div class="student-sub" id="display-student-id">ID: N/A</div>
+          </div>
+        </div>
+
+        <div class="grid-card">
+          <div class="grid-card-header">
+            <span class="label">Questions</span>
+            <span class="count" id="progress-count">0 / 25 Answered</span>
+          </div>
+          <div class="q-grid" id="q-grid">
+            <!-- 25 Cells populated by JS -->
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><i class="indicator-dot unanswered"></i> Unanswered</span>
+          <span><i class="indicator-dot answered"></i> Answered</span>
+          <span><i class="indicator-dot marked"></i> Marked</span>
+        </div>
+      </aside>
+
+      <!-- QUESTION PANEL -->
+      <section class="question-panel">
+        <div class="question-nav">
+          <div class="question-counter" id="question-counter">Question 1 of 25</div>
+          <button class="btn btn-ghost" id="btn-mark" onclick="toggleMarkQuestion()">🔖 Mark for Review</button>
+        </div>
+
+        <div class="question-card">
+          <span class="question-topic-tag" id="question-topic-tag">Kinematics II</span>
+          <div class="question-text" id="question-text">
+            Question text will load here...
+          </div>
+
+          <div id="diagram-container" class="question-diagram" style="display:none;"></div>
+
+          <div class="options-list" id="options-list">
+            <!-- Options populated by JS -->
+          </div>
+
+          <div class="question-actions">
+            <button class="btn btn-ghost nav-btn" id="btn-prev" onclick="navigateQuestion(-1)">&larr; Previous</button>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-ghost nav-btn" id="btn-next" onclick="navigateQuestion(1)">Next &rarr;</button>
+              <button class="btn btn-primary" onclick="confirmSubmitExam()">Finish &amp; Submit</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ OUTRO SCREEN ============ -->
+  <div id="screen-outro" class="screen">
+    <div class="outro-card">
+      <div class="score-header">
+        <div class="brand-logo" style="margin-bottom:12px;" aria-label="csca.ai">
+          <svg class="csca-logo-svg" viewBox="0 0 108 30" height="28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="23" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="800" font-size="26" fill="currentColor" letter-spacing="-0.03em">csca<tspan fill="#F97316">.</tspan>ai</text>
+          </svg>
+        </div>
+        <div class="score-badge" id="score-badge">PASSED</div>
+        <h2>Exam Performance Summary</h2>
+        <p style="color:var(--ink-soft); margin:0;">Candidate: <strong id="outro-student-name">FirstName LastName</strong></p>
+      </div>
+
+      <div class="score-stats">
+        <div class="stat-box">
+          <div class="stat-val" id="stat-score">0 / 25</div>
+          <div class="stat-lbl">Final Score</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-pct">0%</div>
+          <div class="stat-lbl">Percentage</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-correct">0</div>
+          <div class="stat-lbl">Correct Answers</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-time">0m 0s</div>
+          <div class="stat-lbl">Time Spent</div>
+        </div>
+      </div>
+
+      <div id="export-status" style="text-align:center; font-size:13px; color:var(--ink-soft); margin-bottom:14px;"></div>
+
+      <div style="text-align:center;">
+        <button class="btn btn-primary" onclick="restartExam()">Restart Assessment</button>
+      </div>
+    </div>
+
+    <div class="outro-card">
+      <h3 class="review-title">Detailed Solutions &amp; Analysis</h3>
+      <div class="review-list" id="review-list">
+        <!-- Review items generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCRIPTS ============ -->
+  <script>
+    /* ==========================================================================
+       1. QUESTION BANK: 25 Pure "Kinematics II: Free Fall & 2D Motion" Questions
+       ========================================================================== */
+    const questions = [
+      {
+        id: 1,
+        topic: "Module 1: Free Fall Conditions",
+        question: "Which of the following conditions must be strictly satisfied for an object's motion to be classified as <strong>free fall</strong>? ( )",
+        options: [
+          "A. It must have an initial upward velocity and experience only gravity",
+          "B. Initial velocity must be strictly zero ($v_0 = 0$) and gravity is the sole acting force",
+          "C. The object must be falling at constant velocity",
+          "D. Initial velocity is non-zero pointing downwards and air resistance is present"
+        ],
+        correct: 1,
+        explanation: "By definition, free fall requires two conditions: (1) Initial velocity is zero ($v_0 = 0$), and (2) Gravity is the only force acting on the object (air resistance is negligible). An object thrown downward has $v_0 \\neq 0$, so it is accelerated linear motion, not free fall. [Slide 2 — What Is Free Fall?]"
+      },
+      {
+        id: 2,
+        topic: "Module 1: Free Fall Acceleration",
+        question: "In a complete vacuum, a heavy bowling ball of mass $5\\text{ kg}$ and a light feather of mass $2\\text{ g}$ are dropped simultaneously from the same height. Which statement is correct? ( )",
+        options: [
+          "A. The bowling ball lands first because its gravitational force is much larger",
+          "B. The feather lands first because it has much less inertia",
+          "C. Both land at the exact same instant with identical velocities",
+          "D. The bowling ball accelerates at $g$, while the feather accelerates at $\\frac{g}{2}$"
+        ],
+        correct: 2,
+        explanation: "Galileo's Leaning Tower principle states that in a vacuum, gravitational acceleration $g = \\frac{F_g}{m} = \\frac{mg}{m} = g$ is strictly independent of mass. Both objects accelerate at the identical rate $g$ and land simultaneously with the same velocity. [Slide 3 — Gravitational Acceleration]"
+      },
+      {
+        id: 3,
+        topic: "Module 1: Free Fall Calculation",
+        question: "A water droplet with zero initial velocity falls from an eaves $5\\text{ m}$ high above the ground (air resistance is negligible). What is the speed at which the water droplet hits the ground? (Take $g = 10\\text{ m/s}^2$) ( )",
+        diagram: `
+          <svg width="260" height="130" viewBox="0 0 260 130">
+            <line x1="40" y1="20" x2="220" y2="20" stroke="#0F172A" stroke-width="3"/>
+            <text x="45" y="15" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#0F172A">Eaves</text>
+            <circle cx="130" cy="24" r="5" fill="#059669"/>
+            <line x1="130" y1="26" x2="130" y2="105" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="4,3"/>
+            <polygon points="130,110 126,102 134,102" fill="#EF4444"/>
+            <text x="142" y="68" font-family="'JetBrains Mono', monospace" font-size="12" fill="#EF4444">h = 5 m</text>
+            <line x1="40" y1="110" x2="220" y2="110" stroke="#0F172A" stroke-width="3"/>
+            <text x="45" y="125" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#0F172A">Ground</text>
+          </svg>
+        `,
+        options: [
+          "A. $5\\text{ m/s}$",
+          "B. $10\\text{ m/s}$",
+          "C. $2\\text{ m/s}$",
+          "D. $20\\text{ m/s}$"
+        ],
+        correct: 1,
+        explanation: "Using the formula connecting velocity and fallen distance without time: $v = \\sqrt{2gh} = \\sqrt{2 \\times 10 \\times 5} = \\sqrt{100} = 10\\text{ m/s}$. [Slide 5 — Free Fall Velocity from Eaves & Jan Paper Q20]"
+      },
+      {
+        id: 4,
+        topic: "Module 1: Free Fall Time",
+        question: "An object falls freely from rest from a height of $h = 5\\text{ m}$ to the ground. The time it takes to reach the ground is ( ). (Take $g = 10\\text{ m/s}^2$)",
+        options: [
+          "A. $4\\text{ s}$",
+          "B. $1\\text{ s}$",
+          "C. $2\\text{ s}$",
+          "D. $3\\text{ s}$"
+        ],
+        correct: 1,
+        explanation: "From $h = \\frac{1}{2}gt^2$, we solve for time: $t = \\sqrt{\\frac{2h}{g}} = \\sqrt{\\frac{2 \\times 5}{10}} = \\sqrt{1} = 1\\text{ s}$. [Jan Paper Q10]"
+      },
+      {
+        id: 5,
+        topic: "Module 1: Fallen vs Remaining Height",
+        question: "An object falls freely from a height of $H = 100\\text{ m}$ above the ground. What is its height above the ground at the end of $t = 4\\text{ s}$? (Take $g = 10\\text{ m/s}^2$) ( )",
+        diagram: `
+          <svg width="280" height="150" viewBox="0 0 280 150">
+            <!-- Building -->
+            <rect x="50" y="20" width="40" height="110" fill="#E2E8F0" stroke="#0F172A" stroke-width="2"/>
+            <line x1="20" y1="130" x2="260" y2="130" stroke="#0F172A" stroke-width="3"/>
+            <!-- Fall trajectory -->
+            <circle cx="150" cy="20" r="5" fill="#059669"/>
+            <text x="160" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="11" fill="#059669">Release (A)</text>
+            <line x1="150" y1="25" x2="150" y2="95" stroke="#EF4444" stroke-width="2"/>
+            <polygon points="150,97 146,90 154,90" fill="#EF4444"/>
+            <text x="160" y="60" font-family="'JetBrains Mono', monospace" font-size="11" fill="#EF4444">Fallen: h = ½gt² = 80 m</text>
+            <line x1="150" y1="97" x2="150" y2="130" stroke="#059669" stroke-width="2" stroke-dasharray="3,3"/>
+            <text x="160" y="118" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="11" fill="#059669">Remaining: H − h = ?</text>
+            <text x="15" y="75" font-family="'JetBrains Mono', monospace" font-size="11" fill="#475569">H = 100m</text>
+          </svg>
+        `,
+        options: [
+          "A. $45\\text{ m}$",
+          "B. $10\\text{ m}$",
+          "C. $80\\text{ m}$",
+          "D. $20\\text{ m}$"
+        ],
+        correct: 3,
+        explanation: "Distance fallen in $4\\text{ s}$ is $h = \\frac{1}{2}gt^2 = \\frac{1}{2}(10)(4^2) = 80\\text{ m}$. The question asks for the remaining height above the ground: $H_{\\text{remaining}} = H - h = 100\\text{ m} - 80\\text{ m} = 20\\text{ m}$. Do not confuse distance fallen ($80\\text{ m}$) with remaining height! [Slide 6 & 7 / CSCA Dec Exam Q8]"
+      },
+      {
+        id: 6,
+        topic: "Module 1: Free Fall Ratios",
+        question: "An object falls freely from rest from a certain height and covers half of the total height in the first second ($t = 1\\text{ s}$). The additional time needed to reach the ground is ( ).",
+        options: [
+          "A. $(\\sqrt{2} - 1)\\text{ s}$",
+          "B. $1\\text{ s}$",
+          "C. $\\sqrt{2}\\text{ s}$",
+          "D. $1.5\\text{ s}$"
+        ],
+        correct: 0,
+        explanation: "In $t_1 = 1\\text{ s}$, distance fallen is $h_1 = \\frac{1}{2}g(1)^2 = \\frac{g}{2}$. Since this is half the total height $H$, the total height is $H = 2h_1 = g$. The total fall time is $t_{\\text{total}} = \\sqrt{\\frac{2H}{g}} = \\sqrt{\\frac{2g}{g}} = \\sqrt{2}\\text{ s}$. The additional time needed is $\\Delta t = t_{\\text{total}} - t_1 = (\\sqrt{2} - 1)\\text{ s}$. [Slide 7 & Jan Paper Q6]"
+      },
+      {
+        id: 7,
+        topic: "Module 1: Consecutive Time Interval Ratios",
+        question: "An object is released from rest in free fall. The ratio of the vertical distances fallen in the 1st second, the 2nd second, and the 3rd second is ( ).",
+        options: [
+          "A. $1 : 2 : 3$",
+          "B. $1 : 3 : 5$",
+          "C. $1 : 4 : 9$",
+          "D. $1 : \\sqrt{2} : \\sqrt{3}$"
+        ],
+        correct: 1,
+        explanation: "For uniformly accelerated motion starting from rest ($v_0 = 0$), distances covered in successive equal time intervals follow Galileo's odd-number rule: $\\Delta h_1 : \\Delta h_2 : \\Delta h_3 : \\cdots = 1 : 3 : 5 : 7 : \\cdots$. (Notice $h_1 = \\frac{1}{2}g(1) = 5\\text{ m}$, $h_2 = 20 - 5 = 15\\text{ m}$, $h_3 = 45 - 20 = 25\\text{ m}$, giving $5:15:25 = 1:3:5$). [Slide 2 & General Kinematics Practice]"
+      },
+      {
+        id: 8,
+        topic: "Module 1: Last Second of Free Fall",
+        question: "An object falls freely from rest from the top of a cliff and hits the ground after exactly $3\\text{ s}$. What fraction of the total height did it fall during the <strong>last second</strong> of its motion? (Take $g = 10\\text{ m/s}^2$) ( )",
+        options: [
+          "A. $\\dfrac{1}{3}$",
+          "B. $\\dfrac{5}{9}$",
+          "C. $\\dfrac{4}{9}$",
+          "D. $\\dfrac{1}{2}$"
+        ],
+        correct: 1,
+        explanation: "Total height fallen in $3\\text{ s}$: $H = \\frac{1}{2}g(3^2) = \\frac{9}{2}g = 45\\text{ m}$. Height fallen in the first $2\\text{ s}$: $h_2 = \\frac{1}{2}g(2^2) = \\frac{4}{2}g = 20\\text{ m}$. Distance fallen during the 3rd (last) second: $\\Delta h_3 = 45 - 20 = 25\\text{ m}$. Fraction $= \\frac{25}{45} = \\frac{5}{9}$."
+      },
+      {
+        id: 9,
+        topic: "Module 1: Equal Distances Time Ratio",
+        question: "An object falls freely from rest. If the total distance is divided into three consecutive equal segments of height $h$, the ratio of the times taken to fall through these three segments is ( ).",
+        options: [
+          "A. $1 : 2 : 3$",
+          "B. $1 : \\sqrt{2} : \\sqrt{3}$",
+          "C. $1 : (\\sqrt{2} - 1) : (\\sqrt{3} - \\sqrt{2})$",
+          "D. $1 : 3 : 5$"
+        ],
+        correct: 2,
+        explanation: "Time to reach distance $h$ is $t_1 = \\sqrt{\\frac{2h}{g}}$. Time to reach $2h$ is $t_2 = \\sqrt{\\frac{4h}{g}} = \\sqrt{2}t_1$. Time to reach $3h$ is $t_3 = \\sqrt{\\frac{6h}{g}} = \\sqrt{3}t_1$. The time intervals for the 1st, 2nd, and 3rd segments are $t_1$, $(\\sqrt{2}-1)t_1$, and $(\\sqrt{3}-\\sqrt{2})t_1$, so the ratio is $1 : (\\sqrt{2}-1) : (\\sqrt{3}-\\sqrt{2})$."
+      },
+      {
+        id: 10,
+        topic: "Module 1: Free Fall Acceleration Value",
+        question: "An astronaut on planet X drops an apple from rest from a height of $h = 8\\text{ m}$, and it takes $2\\text{ s}$ to strike the ground. The gravitational acceleration on planet X is ( ).",
+        options: [
+          "A. $2\\text{ m/s}^2$",
+          "B. $4\\text{ m/s}^2$",
+          "C. $8\\text{ m/s}^2$",
+          "D. $10\\text{ m/s}^2$"
+        ],
+        correct: 1,
+        explanation: "From $h = \\frac{1}{2}gt^2$, we solve for $g$: $g = \\frac{2h}{t^2} = \\frac{2 \\times 8}{2^2} = \\frac{16}{4} = 4\\text{ m/s}^2$."
+      },
+      {
+        id: 11,
+        topic: "Module 2: Vertical Projection (Upward Throw)",
+        question: "A ball is thrown vertically upward from the ground with an initial speed of $u = 20\\text{ m/s}$. Assuming air resistance is negligible and $g = 10\\text{ m/s}^2$, what are the maximum height reached ($H_{\\text{max}}$) and the total hang time ($t_{\\text{total}}$) before landing? ( )",
+        options: [
+          "A. $H = 40\\text{ m},\\; t = 2\\text{ s}$",
+          "B. $H = 10\\text{ m},\\; t = 4\\text{ s}$",
+          "C. $H = 20\\text{ m},\\; t = 4\\text{ s}$",
+          "D. $H = 20\\text{ m},\\; t = 2\\text{ s}$"
+        ],
+        correct: 2,
+        explanation: "Maximum height reached: $H_{\\text{max}} = \\frac{u^2}{2g} = \\frac{20^2}{2 \\times 10} = \\frac{400}{20} = 20\\text{ m}$. Time to reach apex: $t_{\\text{rise}} = \\frac{u}{g} = \\frac{20}{10} = 2\\text{ s}$. By symmetry, total hang time is $t_{\\text{total}} = 2 t_{\\text{rise}} = 4\\text{ s}$. [Slide 8 & 9 — Motion Thrown Straight Up]"
+      },
+      {
+        id: 12,
+        topic: "Module 2: Apex Conditions",
+        question: "When a ball thrown straight upward reaches its highest point (apex), which statement concerning its instantaneous velocity $v$ and acceleration $a$ is correct? ( )",
+        options: [
+          "A. Both velocity and acceleration are zero",
+          "B. Velocity is zero, while acceleration is $g$ directed vertically downward",
+          "C. Velocity is maximum, while acceleration is zero",
+          "D. Velocity is zero, while acceleration is directed vertically upward"
+        ],
+        correct: 1,
+        explanation: "At the peak apex, the ball momentarily stops ($v = 0$), but gravity continues to act without interruption. Therefore, the acceleration is constant at $a = g = 10\\text{ m/s}^2$ directed vertically downward. [Slide 8 — Sign Convention & Apex]"
+      },
+      {
+        id: 13,
+        topic: "Module 2: Vertical Throw Symmetry",
+        question: "An arrow is shot vertically upward with an initial speed $u = 30\\text{ m/s}$. Neglecting air resistance and taking $g = 10\\text{ m/s}^2$, what is its speed when it falls back to the exact initial launch height? ( )",
+        options: [
+          "A. $0\\text{ m/s}$",
+          "B. $15\\text{ m/s}$",
+          "C. $30\\text{ m/s}$",
+          "D. $60\\text{ m/s}$"
+        ],
+        correct: 2,
+        explanation: "By conservation of mechanical energy and flight symmetry, when an object returns to its original launch level in the absence of air resistance, its return speed equals its initial launch speed: $|v| = u = 30\\text{ m/s}$. [Slide 8 — Symmetry of Vertical Flight]"
+      },
+      {
+        id: 14,
+        topic: "Module 2: Passing Height Twice",
+        question: "A stone thrown vertically upward from the ground passes a point $15\\text{ m}$ above the ground twice: once on the way up and once on the way down. If the initial speed was $u = 20\\text{ m/s}$ and $g = 10\\text{ m/s}^2$, what is the time interval between these two moments? ( )",
+        options: [
+          "A. $1\\text{ s}$",
+          "B. $2\\text{ s}$",
+          "C. $3\\text{ s}$",
+          "D. $4\\text{ s}$"
+        ],
+        correct: 1,
+        explanation: "Set $h = ut - \\frac{1}{2}gt^2$: $15 = 20t - 5t^2 \\implies 5t^2 - 20t + 15 = 0 \\implies t^2 - 4t + 3 = 0$. Factoring gives $(t - 1)(t - 3) = 0$, so $t_1 = 1\\text{ s}$ (way up) and $t_2 = 3\\text{ s}$ (way down). The time elapsed between passing this height is $\\Delta t = t_2 - t_1 = 3 - 1 = 2\\text{ s}$."
+      },
+      {
+        id: 15,
+        topic: "Module 2: Upward vs Downward Throw Comparison",
+        question: "From the top of a building of height $H$, ball A is thrown vertically upward with speed $v_0$ and ball B is thrown vertically downward with the same speed $v_0$. Neglecting air resistance, which ball strikes the ground with greater speed? ( )",
+        options: [
+          "A. Ball A strikes with greater speed",
+          "B. Ball B strikes with greater speed",
+          "C. Both strike the ground with the exact same speed",
+          "D. It depends on their respective masses"
+        ],
+        correct: 2,
+        explanation: "Ball A rises to its apex and returns to the roof level with downward speed $v_0$, identical to Ball B's initial downward speed. From the roof to the ground, both balls start with identical downward speeds and accelerate under gravity through height $H$. By $v^2 = v_0^2 + 2gH$, both hit the ground with the exact same speed."
+      },
+      {
+        id: 16,
+        topic: "Module 3: Horizontal Projectile (平抛运动)",
+        question: "A small ball is thrown horizontally from a building $20\\text{ m}$ high with an initial velocity of $v_0 = 20\\text{ m/s}$. Neglecting air resistance, the magnitude of the ball's velocity upon landing is ( ). (Take $g = 10\\text{ m/s}^2$)",
+        options: [
+          "A. $40\\sqrt{2}\\text{ m/s}$",
+          "B. $20\\sqrt{2}\\text{ m/s}$",
+          "C. $40\\text{ m/s}$",
+          "D. $20\\text{ m/s}$"
+        ],
+        correct: 1,
+        explanation: "Horizontal velocity remains constant: $v_x = v_0 = 20\\text{ m/s}$. Vertical velocity upon landing from height $H = 20\\text{ m}$: $v_y = \\sqrt{2gH} = \\sqrt{2 \\times 10 \\times 20} = 20\\text{ m/s}$. Total impact velocity magnitude: $v = \\sqrt{v_x^2 + v_y^2} = \\sqrt{20^2 + 20^2} = 20\\sqrt{2}\\text{ m/s}$. [CSCA Reconstructed Paper 12.21 Q39 & Slide 11]"
+      },
+      {
+        id: 17,
+        topic: "Module 3: Projectile Flight Time",
+        question: "For an object undergoing horizontal projectile motion (平抛运动) launched from height $H$, the total time of flight $t$ depends on ( ).",
+        options: [
+          "A. Only the initial horizontal launch velocity $v_0$",
+          "B. Both the launch height $H$ and the horizontal velocity $v_0$",
+          "C. Only the launch height $H$ and gravitational acceleration $g$",
+          "D. The mass of the object and $v_0$"
+        ],
+        correct: 2,
+        explanation: "Because vertical motion is completely independent of horizontal motion and starts with zero initial vertical velocity ($v_{0y} = 0$), vertical motion satisfies $H = \\frac{1}{2}gt^2$. Thus $t = \\sqrt{\\frac{2H}{g}}$, which depends strictly on $H$ and $g$, completely independent of $v_0$ and mass! [Slide 11 — Flight Time Dictated Solely by Height]"
+      },
+      {
+        id: 18,
+        topic: "Module 3: Range & Double Velocity",
+        question: "A ball is thrown horizontally from a certain height at an initial velocity $v_0$ and lands on level ground with a horizontal displacement $x$. If the ball is thrown again from the <strong>same height</strong> horizontally at $2v_0$, during the second throw ( ).",
+        options: [
+          "A. The horizontal displacement becomes twice the original ($2x$), while time of fall remains unchanged",
+          "B. The time taken to fall becomes twice of the original",
+          "C. The horizontal displacement becomes half of the original",
+          "D. The time taken to fall becomes half of the original"
+        ],
+        correct: 0,
+        explanation: "Since the height is unchanged, the fall time $t = \\sqrt{\\frac{2H}{g}}$ remains exactly the same. The horizontal range is $x' = (2v_0)t = 2(v_0 t) = 2x$. Thus, horizontal displacement doubles while flight time remains unchanged. [Jan Paper Q39 & Slide 11]"
+      },
+      {
+        id: 19,
+        topic: "Module 3: Horizontal Range Calculation",
+        question: "A rescue plane flying horizontally at speed $v_0 = 15\\text{ m/s}$ drops an aid package from a height of $H = 45\\text{ m}$. Neglecting air resistance and taking $g = 10\\text{ m/s}^2$, the horizontal distance between the release point and the landing point is ( ).",
+        diagram: `
+          <svg width="280" height="130" viewBox="0 0 280 130">
+            <line x1="40" y1="20" x2="100" y2="20" stroke="#0F172A" stroke-width="2"/>
+            <line x1="40" y1="20" x2="40" y2="110" stroke="#0F172A" stroke-width="2"/>
+            <line x1="30" y1="110" x2="250" y2="110" stroke="#0F172A" stroke-width="2.5"/>
+            <!-- Projectile arc -->
+            <path d="M 40,20 Q 140,20 200,110" fill="none" stroke="#EF4444" stroke-width="2.5"/>
+            <!-- v0 vector -->
+            <line x1="40" y1="20" x2="85" y2="20" stroke="#059669" stroke-width="2.5"/>
+            <polygon points="88,20 81,16 81,24" fill="#059669"/>
+            <text x="92" y="24" font-family="'JetBrains Mono', monospace" font-size="11" fill="#059669">v₀ = 15 m/s</text>
+            <text x="12" y="65" font-family="'JetBrains Mono', monospace" font-size="11" fill="#475569">H = 45m</text>
+            <!-- Range -->
+            <line x1="40" y1="120" x2="200" y2="120" stroke="#059669" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <text x="105" y="126" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="11" fill="#059669">Range x = ?</text>
+          </svg>
+        `,
+        options: [
+          "A. $30\\text{ m}$",
+          "B. $45\\text{ m}$",
+          "C. $60\\text{ m}$",
+          "D. $90\\text{ m}$"
+        ],
+        correct: 1,
+        explanation: "Flight time is $t = \\sqrt{\\frac{2H}{g}} = \\sqrt{\\frac{2 \\times 45}{10}} = \\sqrt{9} = 3\\text{ s}$. Horizontal range is $x = v_0 t = 15\\text{ m/s} \\times 3\\text{ s} = 45\\text{ m}$."
+      },
+      {
+        id: 20,
+        topic: "Module 3: Projectile Landing Angle",
+        question: "A ball is launched horizontally from a platform. Upon landing on the ground, its vertical velocity component is found to equal its horizontal velocity component ($v_y = v_x$). The angle that the landing velocity makes with the horizontal ground is ( ).",
+        options: [
+          "A. $30^{\\circ}$",
+          "B. $45^{\\circ}$",
+          "C. $60^{\\circ}$",
+          "D. $90^{\\circ}$"
+        ],
+        correct: 1,
+        explanation: "The angle $\\alpha$ with the horizontal satisfies $\\tan\\alpha = \\frac{v_y}{v_x}$. Since $v_y = v_x$, we have $\\tan\\alpha = 1$, which gives $\\alpha = 45^{\\circ}$."
+      },
+      {
+        id: 21,
+        topic: "Module 3: Simultaneous Release Experiment",
+        question: "A hunter aims a gun horizontally directly at a target monkey hanging from a tree at the exact same horizontal height. At the exact instant the bullet leaves the muzzle, the monkey lets go and drops freely. Neglecting air resistance, what happens? ( )",
+        options: [
+          "A. The bullet passes safely above the falling monkey",
+          "B. The bullet passes safely below the falling monkey",
+          "C. The bullet will inevitably hit the falling monkey regardless of bullet speed (provided it reaches the tree)",
+          "D. The bullet hits only if its speed exceeds $1000\\text{ m/s}$"
+        ],
+        correct: 2,
+        explanation: "Both the bullet and the monkey experience the exact same downward gravitational acceleration $g$ starting with zero initial vertical velocity ($v_{0y} = 0$). Over elapsed time $t$, both fall by the identical vertical distance $h = \\frac{1}{2}gt^2$. Hence, the bullet and the monkey remain at identical heights at every instant and will collide."
+      },
+      {
+        id: 22,
+        topic: "Module 3: Trajectory & Vector Directions",
+        question: "Which diagram correctly depicts the directions of velocity ($\\vec{v}$ in blue) and acceleration ($\\vec{a}$ in red) of a projectile along its flight path? ( )",
+        diagram: `
+          <svg width="340" height="150" viewBox="0 0 340 150">
+            <!-- (A) -->
+            <g transform="translate(10, 10)">
+              <path d="M 10,20 Q 40,20 65,60" fill="none" stroke="#0F172A" stroke-width="1.5"/>
+              <line x1="30" y1="22" x2="48" y2="28" stroke="#2563EB" stroke-width="2"/>
+              <line x1="30" y1="22" x2="45" y2="15" stroke="#EF4444" stroke-width="2"/>
+              <text x="32" y="75" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#0F172A">(A)</text>
+            </g>
+            <!-- (B) -->
+            <g transform="translate(95, 10)">
+              <path d="M 10,20 Q 40,20 65,60" fill="none" stroke="#0F172A" stroke-width="1.5"/>
+              <line x1="30" y1="22" x2="48" y2="28" stroke="#2563EB" stroke-width="2"/>
+              <line x1="30" y1="22" x2="48" y2="35" stroke="#EF4444" stroke-width="2"/>
+              <text x="32" y="75" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#0F172A">(B)</text>
+            </g>
+            <!-- (C) Correct -->
+            <g transform="translate(180, 10)">
+              <path d="M 10,20 Q 40,20 65,60" fill="none" stroke="#0F172A" stroke-width="1.5"/>
+              <!-- Tangent v in blue -->
+              <line x1="28" y1="22" x2="52" y2="34" stroke="#2563EB" stroke-width="2.5"/>
+              <polygon points="54,35 46,31 49,38" fill="#2563EB"/>
+              <text x="56" y="32" font-family="'JetBrains Mono', monospace" font-size="10" fill="#2563EB">v</text>
+              <!-- a straight down in red -->
+              <line x1="28" y1="22" x2="28" y2="48" stroke="#EF4444" stroke-width="2.5"/>
+              <polygon points="28,51 25,44 31,44" fill="#EF4444"/>
+              <text x="18" y="44" font-family="'JetBrains Mono', monospace" font-size="10" fill="#EF4444">a</text>
+              <text x="32" y="75" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#059669">(C)</text>
+            </g>
+            <!-- (D) -->
+            <g transform="translate(265, 10)">
+              <path d="M 10,20 Q 40,20 65,60" fill="none" stroke="#0F172A" stroke-width="1.5"/>
+              <line x1="28" y1="22" x2="52" y2="34" stroke="#2563EB" stroke-width="2"/>
+              <line x1="28" y1="22" x2="28" y2="5" stroke="#EF4444" stroke-width="2"/>
+              <text x="32" y="75" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="12" fill="#0F172A">(D)</text>
+            </g>
+          </svg>
+        `,
+        options: [
+          "A. Diagram (A)",
+          "B. Diagram (B)",
+          "C. Diagram (C)",
+          "D. Diagram (D)"
+        ],
+        correct: 2,
+        explanation: "Two core rules govern projectile vector directions: (1) The instantaneous velocity vector $\\vec{v}$ must always be tangent to the trajectory curve pointing in the direction of motion, and (2) The acceleration is solely due to gravity, so $\\vec{a} = \\vec{g}$ must point strictly vertically downward at all times! Diagram (C) satisfies both conditions. [Slide 12 & 13 / CSCA March Exam Q23]"
+      },
+      {
+        id: 23,
+        topic: "Module 3: Curvilinear Motion Velocity Direction",
+        question: "When a dry autumn leaf flutters and falls through the air along an irregular curved path, what is the direction of its instantaneous velocity at any point along the trajectory? ( )",
+        options: [
+          "A. Directed towards the ground vertically downward",
+          "B. Along the tangent line to the trajectory curve at that point",
+          "C. Along the normal line perpendicular to the curve",
+          "D. In the direction of the net force acting on the leaf"
+        ],
+        correct: 1,
+        explanation: "In all curvilinear motion, the instantaneous velocity vector is strictly along the tangent to the trajectory curve at that point, pointing in the direction of forward motion. [Jan Paper Q36]"
+      },
+      {
+        id: 24,
+        topic: "Module 3: 2D Projectile Apex Velocity",
+        question: "A projectile is launched from ground level with speed $u$ at an angle $\\theta$ above the horizontal. At the highest point (apex) of its 2D parabolic trajectory, its speed is ( ).",
+        options: [
+          "A. $0$",
+          "B. $u$",
+          "C. $u\\cos\\theta$",
+          "D. $u\\sin\\theta$"
+        ],
+        correct: 2,
+        explanation: "At the summit of a 2D projectile trajectory, the vertical velocity is momentarily zero ($v_y = 0$). However, the horizontal velocity component remains completely unaffected at its constant value $v_x = u\\cos\\theta$. Therefore, the total speed at the apex is $v = \\sqrt{v_x^2 + v_y^2} = u\\cos\\theta \\neq 0$! [Slide 10 — Decomposition Along Trajectory]"
+      },
+      {
+        id: 25,
+        topic: "Module 1: Instantaneous Power in Free Fall",
+        question: "An object with mass $m$ falls freely from rest under gravity $g$. Neglecting air resistance, the instantaneous power delivered by gravity to the object at elapsed time $t$ is ( ).",
+        options: [
+          "A. $\\dfrac{1}{2}mg^2 t$",
+          "B. $mgt$",
+          "C. $mg^2 t$",
+          "D. $\\dfrac{1}{4}mgt$"
+        ],
+        correct: 2,
+        explanation: "Instantaneous power is $P = F \\cdot v$. For free fall, the gravitational force is $F = mg$, and downward velocity at time $t$ is $v = gt$. Therefore, $P = mg(gt) = mg^2 t$. [Jan Paper Q41]"
+      }
+    ];
+
+    /* ==========================================================================
+       2. EXAM STATE & BACKEND CLOUDFLARE SUBMISSION
+       ========================================================================== */
+    const RESULTS_API_URL = 'https://csca-results.csca-test.workers.dev/submit';
+    const PENDING_KEY = 'csca_pending_result';
+
+    let studentInfo = { name: '', id: '' };
+    let entryTimestamp = null;
+    let exitTimestamp = null;
+    let submissionId = null;
+    let currentQIndex = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    let markedQuestions = new Array(questions.length).fill(false);
+    let examDurationSeconds = 45 * 60; // 45 minutes
+    let timeRemaining = examDurationSeconds;
+    let timerInterval = null;
+
+    /* ==========================================================================
+       3. INTERACTIVE CANVAS ANIMATION (FREE FALL / GRAVITY TRAJECTORY PARTICLES)
+       ========================================================================== */
+    (function initInteractiveCanvas() {
+      const canvas = document.getElementById('entry-bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let mouse = { x: null, y: null, radius: 150 };
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      const particles = [];
+      const count = Math.min(Math.floor(window.innerWidth / 22), 48);
+
+      class ProjectileNode {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = Math.random() * 1.2 + 0.3; // subtle downward drift
+          this.radius = Math.random() * 3 + 2;
+          this.color = ['#10B981', '#34D399', '#059669', '#F97316', '#38BDF8'][Math.floor(Math.random() * 5)];
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < -10) this.x = width + 10;
+          if (this.x > width + 10) this.x = -10;
+          if (this.y > height + 10) {
+            this.y = -10;
+            this.x = Math.random() * width;
+          }
+
+          if (mouse.x !== null && mouse.y !== null) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius) {
+              const force = (1 - dist / mouse.radius) * 0.15;
+              this.vx += (dx / dist) * force;
+              this.vy += (dy / dist) * force;
+            }
+          }
+          this.vx *= 0.99;
+        }
+
+        draw() {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.globalAlpha = 0.75;
+          ctx.fill();
+
+          // Acceleration vector indicator (downward)
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(this.x, this.y + 6);
+          ctx.strokeStyle = '#F97316';
+          ctx.globalAlpha = 0.45;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < count; i++) {
+        particles.push(new ProjectileNode());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 130) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = '#34D399';
+              ctx.globalAlpha = (1 - dist / 130) * 0.18;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    /* ==========================================================================
+       4. SCREEN NAVIGATION & INTERACTIVITY
+       ========================================================================== */
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('is-active'));
+      document.getElementById(screenId).classList.add('is-active');
+    }
+
+    function handleStartExam(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('student-name-input').value.trim();
+      const idInput = document.getElementById('student-id-input').value.trim();
+
+      if (!nameInput) return;
+
+      studentInfo.name = nameInput;
+      studentInfo.id = idInput || 'CSCA-PHYS-2026';
+      entryTimestamp = new Date();
+      submissionId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+
+      document.getElementById('display-student-name').textContent = studentInfo.name;
+      document.getElementById('display-student-id').textContent = 'ID: ' + studentInfo.id;
+      
+      const initials = studentInfo.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('student-avatar').textContent = initials || 'FL';
+
+      buildQuestionGrid();
+      loadQuestion(0);
+      startTimer();
+
+      showScreen('screen-exam');
+      if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function buildQuestionGrid() {
+      const grid = document.getElementById('q-grid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < questions.length; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'q-cell';
+        cell.textContent = i + 1;
+        cell.id = `q-cell-${i}`;
+        cell.onclick = () => loadQuestion(i);
+        grid.appendChild(cell);
+      }
+      updateGridState();
+    }
+
+    function updateGridState() {
+      let answeredCount = 0;
+
+      for (let i = 0; i < questions.length; i++) {
+        const cell = document.getElementById(`q-cell-${i}`);
+        if (!cell) continue;
+
+        cell.className = 'q-cell';
+        if (i === currentQIndex) cell.classList.add('current');
+        if (userAnswers[i] !== null) {
+          cell.classList.add('answered');
+          answeredCount++;
+        }
+        if (markedQuestions[i]) {
+          cell.classList.add('marked');
+        }
+      }
+
+      document.getElementById('progress-count').textContent = `${answeredCount} / ${questions.length} Answered`;
+    }
+
+    function loadQuestion(index) {
+      currentQIndex = index;
+      const q = questions[index];
+
+      document.getElementById('question-counter').textContent = `Question ${index + 1} of ${questions.length}`;
+      document.getElementById('question-topic-tag').textContent = q.topic;
+      document.getElementById('question-text').innerHTML = q.question;
+
+      const diagramContainer = document.getElementById('diagram-container');
+      if (q.diagram) {
+        diagramContainer.innerHTML = q.diagram;
+        diagramContainer.style.display = 'flex';
+      } else {
+        diagramContainer.innerHTML = '';
+        diagramContainer.style.display = 'none';
+      }
+
+      const markBtn = document.getElementById('btn-mark');
+      markBtn.style.color = markedQuestions[index] ? 'var(--brand-orange)' : 'var(--ink-soft)';
+      markBtn.textContent = markedQuestions[index] ? '🔖 Marked' : '🔖 Mark for Review';
+
+      const list = document.getElementById('options-list');
+      list.innerHTML = '';
+
+      q.options.forEach((optText, optIdx) => {
+        const item = document.createElement('div');
+        item.className = 'option-item' + (userAnswers[index] === optIdx ? ' selected' : '');
+        item.onclick = () => selectOption(optIdx);
+
+        item.innerHTML = `
+          <div class="option-radio"></div>
+          <div>${optText}</div>
+        `;
+        list.appendChild(item);
+      });
+
+      document.getElementById('btn-prev').disabled = (index === 0);
+      document.getElementById('btn-next').disabled = (index === questions.length - 1);
+
+      updateGridState();
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([document.getElementById('question-text'), document.getElementById('options-list')]);
+      }
+    }
+
+    function selectOption(optIdx) {
+      userAnswers[currentQIndex] = optIdx;
+      loadQuestion(currentQIndex);
+    }
+
+    function toggleMarkQuestion() {
+      markedQuestions[currentQIndex] = !markedQuestions[currentQIndex];
+      loadQuestion(currentQIndex);
+    }
+
+    function navigateQuestion(dir) {
+      const newIndex = currentQIndex + dir;
+      if (newIndex >= 0 && newIndex < questions.length) {
+        loadQuestion(newIndex);
+      }
+    }
+
+    /* ==========================================================================
+       5. TIMER & SUBMISSION
+       ========================================================================== */
+    function startTimer() {
+      timeRemaining = examDurationSeconds;
+      const display = document.getElementById('timer-display');
+      const track = document.getElementById('timer-track');
+      const fill = document.getElementById('timer-fill');
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = timeRemaining % 60;
+        display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        const pct = (timeRemaining / examDurationSeconds) * 100;
+        fill.style.width = `${pct}%`;
+
+        if (timeRemaining <= 300) {
+          display.classList.add('critical');
+          track.classList.add('critical');
+        }
+
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          alert("Time has expired! Submitting your exam automatically.");
+          submitExam();
+        }
+      }, 1000);
+    }
+
+    function confirmSubmitExam() {
+      const unanswered = userAnswers.filter(a => a === null).length;
+      let msg = "Are you sure you want to submit your exam?";
+      if (unanswered > 0) {
+        msg = `You have ${unanswered} unanswered question(s). Are you sure you want to finish and submit?`;
+      }
+      if (confirm(msg)) {
+        submitExam();
+      }
+    }
+
+    function submitExam() {
+      clearInterval(timerInterval);
+      exitTimestamp = new Date();
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === questions[idx].correct) correctCount++;
+      });
+
+      const totalPct = Math.round((correctCount / questions.length) * 100);
+      const isPassed = totalPct >= 60;
+
+      document.getElementById('outro-student-name').textContent = studentInfo.name;
+      document.getElementById('stat-score').textContent = `${correctCount} / ${questions.length}`;
+      document.getElementById('stat-pct').textContent = `${totalPct}%`;
+      document.getElementById('stat-correct').textContent = correctCount;
+
+      const spentSecs = examDurationSeconds - timeRemaining;
+      const spentMins = Math.floor(spentSecs / 60);
+      const spentSecRem = spentSecs % 60;
+      document.getElementById('stat-time').textContent = `${spentMins}m ${spentSecRem}s`;
+
+      const badge = document.getElementById('score-badge');
+      if (isPassed) {
+        badge.className = 'score-badge passed';
+        badge.textContent = 'PASSED';
+      } else {
+        badge.className = 'score-badge failed';
+        badge.textContent = 'NEEDS IMPROVEMENT';
+      }
+
+      buildReviewList();
+
+      showScreen('screen-outro');
+      if (window.MathJax) MathJax.typesetPromise([document.getElementById('review-list')]);
+
+      // Cloudflare Backend Submit
+      const wrongQuestions = [];
+      userAnswers.forEach((ans, idx) => {
+        if (ans !== questions[idx].correct) wrongQuestions.push(idx + 1);
+      });
+      submitResult({
+        id: submissionId,
+        username: studentInfo.name,
+        score: correctCount,
+        total: questions.length,
+        percent: totalPct,
+        wrongQuestions: wrongQuestions,
+        startedAt: entryTimestamp ? entryTimestamp.toISOString() : null,
+        submittedAt: exitTimestamp.toISOString()
+      });
+    }
+
+    /* ==========================================================================
+       6. BACKEND API RESULTS UPLOAD (D1 DATABASE SYNC)
+       ========================================================================== */
+    async function postResult(data) {
+      const res = await fetch(RESULTS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('Server responded ' + res.status);
+    }
+
+    async function submitResult(data) {
+      const statusEl = document.getElementById('export-status');
+      if (statusEl) statusEl.textContent = 'Saving your results…';
+
+      try { localStorage.setItem(PENDING_KEY, JSON.stringify(data)); } catch (e) {}
+
+      const delays = [0, 1500, 4000];
+      for (const d of delays) {
+        if (d) await new Promise(r => setTimeout(r, d));
+        try {
+          await postResult(data);
+          try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+          if (statusEl) statusEl.textContent = '✅ Results saved.';
+          return;
+        } catch (err) {
+          console.error('Result upload failed:', err);
+        }
+      }
+      if (statusEl) statusEl.textContent = '⚠️ Could not save results. Keep this page open; retrying automatically.';
+      const t = setInterval(async () => {
+        try {
+          await postResult(data);
+          clearInterval(t);
+          try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+          if (statusEl) statusEl.textContent = '✅ Results saved.';
+        } catch (e) {}
+      }, 15000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const raw = localStorage.getItem(PENDING_KEY);
+        if (raw) postResult(JSON.parse(raw)).then(() => localStorage.removeItem(PENDING_KEY)).catch(() => {});
+      } catch (e) {}
+    });
+
+    function buildReviewList() {
+      const list = document.getElementById('review-list');
+      list.innerHTML = '';
+
+      questions.forEach((q, idx) => {
+        const uAns = userAnswers[idx];
+        const isCorr = uAns === q.correct;
+        const isSkip = uAns === null;
+
+        const item = document.createElement('div');
+        item.className = 'review-item ' + (isSkip ? 'is-skipped' : (isCorr ? 'is-correct' : 'is-incorrect'));
+
+        const userText = isSkip ? '<em>Skipped / Not Answered</em>' : q.options[uAns];
+        const correctText = q.options[q.correct];
+
+        item.innerHTML = `
+          <div class="review-q-num">Question ${idx + 1} &bull; ${q.topic}</div>
+          <div class="review-q-text">${q.question}</div>
+          ${q.diagram ? `<div class="question-diagram" style="margin-bottom:12px;">${q.diagram}</div>` : ''}
+          <div class="review-ans user-ans">Your Answer: <span>${userText}</span></div>
+          ${!isCorr ? `<div class="review-ans correct-ans">Correct Answer: <span>${correctText}</span></div>` : ''}
+          <div class="review-exp"><strong>Explanation:</strong> ${q.explanation}</div>
+        `;
+
+        list.appendChild(item);
+      });
+    }
+
+    function restartExam() {
+      userAnswers.fill(null);
+      markedQuestions.fill(false);
+      currentQIndex = 0;
+      entryTimestamp = null;
+      exitTimestamp = null;
+      submissionId = null;
+      const statusEl = document.getElementById('export-status');
+      if (statusEl) statusEl.textContent = '';
+      showScreen('screen-entry');
+    }
+  </script>
+</body>
+</html>
